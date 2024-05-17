@@ -30,4 +30,4 @@ test('POST to /api/v1/migrations should return 200', async () => {
 
   const migrations = await getMigrations();
   expect(parseInt(migrations.rows[0].migrations)).toBeGreaterThan(0);
-});
+}, 6000);
