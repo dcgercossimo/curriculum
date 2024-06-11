@@ -1,5 +1,5 @@
 const { exec } = require('node:child_process');
-const loadingSpinner = ["⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷"];
+const loadingSpinner = ['⣾', '⣽', '⣻', '⢿', '⡿', '⣟', '⣯', '⣷'];
 let spinnerIndex = 0;
 
 function checkConnection() {
@@ -11,19 +11,18 @@ function checkConnection() {
       process.stdout.cursorTo(0);
       loading();
       setTimeout(() => {
-        checkConnection()
+        checkConnection();
       }, 100);
       return;
     }
 
-    console.log("\n🟢 Banco pronto para conectar (\\o\\O/o/)");
+    console.log('\n🟢 Banco pronto para conectar (\\o\\O/o/)');
   }
 }
 
 function loading() {
   process.stdout.write(`🔴 Aguardando banco aceitar conexões (¬_¬) ${loadingSpinner[spinnerIndex++]} `);
   spinnerIndex = spinnerIndex > 7 ? 0 : spinnerIndex;
-
 }
 
 checkConnection();

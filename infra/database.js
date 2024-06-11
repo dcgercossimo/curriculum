@@ -41,5 +41,5 @@ function getSsl() {
 
 export default {
   query,
-  getNewClient
+  getNewClient,
 };

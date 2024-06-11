@@ -4,8 +4,8 @@ async function status(req, res) {
   const updatedAt = new Date().toISOString();
   const databaseName = process.env.POSTGRES_DB;
   const activeConnections = await database.query({
-    text: "select count(*)::int AS active_connections from pg_stat_activity WHERE datname = $1;",
-    values: [databaseName]
+    text: 'select count(*)::int AS active_connections from pg_stat_activity WHERE datname = $1;',
+    values: [databaseName],
   });
 
   const version = await database.query('SHOW server_version;');

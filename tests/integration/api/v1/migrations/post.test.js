@@ -1,17 +1,17 @@
-import database from "infra/database";
+import database from 'infra/database';
 
 beforeAll(cleanDatabase);
 async function cleanDatabase() {
-  await database.query("drop schema public cascade; create schema public;");
+  await database.query('drop schema public cascade; create schema public;');
 }
 
 async function getMigrations() {
-  return await database.query("select count(*) as migrations from pgmigrations;");
+  return await database.query('select count(*) as migrations from pgmigrations;');
 }
 
 test('POST to /api/v1/migrations should return 200', async () => {
   const resp = await fetch('http://localhost:3000/api/v1/migrations', {
-    method: 'POST'
+    method: 'POST',
   });
   expect(resp.status).toBe(201);
 
@@ -20,7 +20,7 @@ test('POST to /api/v1/migrations should return 200', async () => {
   expect(respBody.length).toBeGreaterThan(0);
 
   const resp2 = await fetch('http://localhost:3000/api/v1/migrations', {
-    method: 'POST'
+    method: 'POST',
   });
   expect(resp2.status).toBe(200);
 
