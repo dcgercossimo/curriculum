@@ -4,7 +4,6 @@ function checkConnection() {
   exec('docker exec postgres-dev pg_isready --host localhost', handleReturn);
 
   function handleReturn(error, stdout) {
-    process.stdout.write('🔴 Aguardando banco aceitar conexões (¬_¬)');
     if (stdout.search('accepting connections') === -1) {
       process.stdout.write('.');
       setTimeout(() => {
@@ -17,4 +16,5 @@ function checkConnection() {
   }
 }
 
+process.stdout.write('🔴 Aguardando banco aceitar conexões (¬_¬)');
 checkConnection();
