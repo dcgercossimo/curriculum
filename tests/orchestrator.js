@@ -1,6 +1,6 @@
-import retry from "async-retry";
+import retry from 'async-retry';
 
-const baseUrl = "http://localhost:3000"; // process.env.BASE_URL;
+const baseUrl = 'http://localhost:3000'; // process.env.BASE_URL;
 
 async function waitForAllServices() {
   await waitForWebServer();
@@ -9,7 +9,7 @@ async function waitForAllServices() {
     return retry(fetchStatusPage, {
       retries: 100,
       maxTimeout: 1000,
-    })
+    });
 
     async function fetchStatusPage() {
       const response = await fetch(`${baseUrl}/api/v1/status`);
@@ -21,4 +21,4 @@ async function waitForAllServices() {
 
 export default {
   waitForAllServices,
-}
+};
