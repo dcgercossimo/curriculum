@@ -13,12 +13,16 @@ async function waitForAllServices() {
 
     async function fetchStatusPage() {
       const response = await fetch(`${baseUrl}/api/v1/status`);
-      // const response = await fetch('http://localhost:3000/api/v1/status');
-      const jsonBody = await response.json();
+
+      if (response.status !== 200) {
+        throw Error();
+      }
     }
   }
 }
 
-export default {
+const orchestrator = {
   waitForAllServices,
 };
+
+export default orchestrator;
