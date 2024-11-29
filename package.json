@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "npm run server:up && npm run migrations:up && next dev",
+    "test": "npm run server:up && npm run concurrent \"jest --runInBand\"",
+    "test:watch": "jest --watchAll --runInBand",
     "server:up": "npm run services:up && npm run services:wait:database",
     "services:up": "docker compose -f infra/compose.yaml up -d",
     "services:down": "docker compose -f infra/compose.yaml down",
@@ -17,8 +19,6 @@
     "lint:eslint:check": "next lint --dir .",
     "lint:secretlint:check": "secretlint . --maskSecrets",
     "concurrent": "concurrently -n next,jest --hide next -k -s command-jest \"next dev\"",
-    "test": "npm run server:up && npm run concurrent \"jest --runInBand\"",
-    "test:watch": "jest --watchAll --runInBand",
     "prepare": "husky",
     "commit": "cz"
   },
