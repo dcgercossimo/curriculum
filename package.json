@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "trap \"services:stop\" INT TERM && npm run services:start && npm run migrations:up && next dev",
     "postdev": "npm run services:stop",
-    "test": "npm run services:start && npm run concurrent \"jest --runInBand\"",
+    "test": "npm run services:start && npm run concurrent \"jest --runInBand --verbose\"",
     "posttest": "npm run services:stop",
-    "test:watch": "jest --watchAll --runInBand",
+    "test:watch": "jest --watchAll --runInBand --verbose",
     "services:start": "npm run services:up && npm run services:wait:database",
     "services:up": "docker compose -f infra/compose.yaml up -d",
     "services:down": "docker compose -f infra/compose.yaml down",
