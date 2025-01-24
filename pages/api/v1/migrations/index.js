@@ -1,49 +1,55 @@
+import { createRouter } from 'next-connect';
 import migrationRunner from 'node-pg-migrate';
 import { resolve } from 'node:path';
 import database from 'infra/database';
+import controller from 'infra/controller';
 
-export default async function migrations(req, res) {
-  const allowedMethods = ['GET', 'POST'];
+const router = createRouter();
 
-  if (!allowedMethods.includes(req.method)) {
-    return res.status(405).json({
-      error: `Method "${req.method}" not allowed`,
-    });
-  }
+router.get(getHandler).post(postHandler);
 
-  let dbClient;
+export default router.handler(controller.errorHandlers);
 
+const defaultMigrationConfig = {
+  dir: resolve('infra', 'migrations'),
+  direction: 'up',
+  dryRun: true,
+  verbose: true,
+  migrationsTable: 'pgmigrations',
+};
+
+async function getHandler(req, res) {
+  const dbClient = await database.getNewClient();
   try {
-    dbClient = await database.getNewClient();
     const migrationConfig = {
+      ...defaultMigrationConfig,
       dbClient: dbClient,
-      dir: resolve('infra', 'migrations'),
-      direction: 'up',
-      dryRun: true,
-      verbose: true,
-      migrationsTable: 'pgmigrations',
     };
 
-    if (req.method === 'GET') {
-      const pendingMigrations = await migrationRunner(migrationConfig);
-      return res.status(200).json(pendingMigrations);
-    }
-
-    if (req.method === 'POST') {
-      const migratedMigrations = await migrationRunner({
-        ...migrationConfig,
-        dryRun: false,
-      });
-
-      return migratedMigrations.length > 0
-        ? res.status(201).json(migratedMigrations)
-        : res.status(200).json(migratedMigrations);
-    }
-  } catch (error) {
-    return res.status(500).json({
-      error: error,
-    });
+    const pendingMigrations = await migrationRunner(migrationConfig);
+    return res.status(200).json(pendingMigrations);
   } finally {
-    await dbClient.end();
+    await dbClient?.end();
+  }
+}
+
+async function postHandler(req, res) {
+  const dbClient = await database.getNewClient();
+  try {
+    const migrationConfig = {
+      ...defaultMigrationConfig,
+      dbClient: dbClient,
+      dryRun: false,
+    };
+
+    const migratedMigrations = await migrationRunner({
+      ...migrationConfig,
+    });
+
+    return migratedMigrations.length > 0
+      ? res.status(201).json(migratedMigrations)
+      : res.status(200).json(migratedMigrations);
+  } finally {
+    await dbClient?.end();
   }
 }
