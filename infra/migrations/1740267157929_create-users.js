@@ -15,14 +15,17 @@ exports.up = (pgm) => {
       notNull: true,
       unique: true,
     },
-    password: { type: 'varchar(72)', notNull: true },
+    password: {
+      type: 'varchar(60)',
+      notNull: true,
+    },
     created_at: {
-      type: 'timestamp',
+      type: 'timestamptz',
       notNull: true,
       default: pgm.func('current_timestamp'),
     },
     updated_at: {
-      type: 'timestamp',
+      type: 'timestamptz',
       notNull: true,
       default: pgm.func('current_timestamp'),
     },

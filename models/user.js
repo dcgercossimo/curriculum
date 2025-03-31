@@ -1,5 +1,5 @@
 import database from 'infra/database';
-import { ValidationError } from 'infra/errors.js';
+import { NotFoundError, ValidationError } from 'infra/errors.js';
 
 async function create(userInput) {
   await validateUniqueEmail(userInput.email);
@@ -9,7 +9,7 @@ async function create(userInput) {
   return newUser;
 
   async function validateUniqueEmail(email) {
-    const user = await findByEmail(email);
+    const user = await findOneByEmail(email);
     if (user) {
       throw new ValidationError({
         message: 'O e-mail informado já está em uso',
@@ -19,7 +19,7 @@ async function create(userInput) {
   }
 
   async function validateUniqueUsername(username) {
-    const user = await findByUsername(username);
+    const user = await findOneByUsername(username);
     if (user) {
       throw new ValidationError({
         message: 'O Username informado já está em uso',
@@ -45,7 +45,18 @@ async function create(userInput) {
   }
 }
 
-async function findByEmail(email) {
+async function readOneByUsername(username) {
+  const userFound = await findOneByUsername(username);
+  if (!userFound) {
+    throw new NotFoundError({
+      message: 'Usuário não encontrado',
+      action: 'Verifique se o username está correto e tente novamente',
+    });
+  }
+  return userFound;
+}
+
+async function findOneByEmail(email) {
   const results = await database.query({
     text: `
       SELECT
@@ -54,13 +65,15 @@ async function findByEmail(email) {
         users
       WHERE
         email = LOWER($1)
+      LIMIT
+        1
       ;`,
     values: [email],
   });
   return results.rows[0];
 }
 
-async function findByUsername(username) {
+async function findOneByUsername(username) {
   const results = await database.query({
     text: `
       SELECT
@@ -68,65 +81,18 @@ async function findByUsername(username) {
       FROM
         users
       WHERE
-        username ~* $1
+        LOWER(username) = LOWER($1)
+      LIMIT
+        1
       ;`,
-    values: [`^${username}$`],
-  });
-  return results.rows[0];
-}
-
-async function findAll() {
-  const results = await database.query({
-    text: `
-      SELECT
-        id, username, email, created_at, updated_at
-      FROM
-        users
-      ;`,
-  });
-  return results.rows;
-}
-
-async function changePassword(userImput) {
-  const { email, password } = userImput;
-  const results = await database.query({
-    text: `
-      UPDATE
-        users
-      SET
-        password = $2
-      WHERE
-        email = $1
-      RETURNING
-        *
-      ;`,
-    values: [email, password],
-  });
-  return results.rows[0];
-}
-
-async function deleteByEmail(email) {
-  const results = await database.query({
-    text: `
-      DELETE FROM
-        users
-      WHERE
-        email = $1
-      RETURNING
-        *
-      ;`,
-    values: [email],
+    values: [username],
   });
   return results.rows[0];
 }
 
 const user = {
   create,
-  findByEmail,
-  findByUsername,
-  findAll,
-  changePassword,
-  deleteByEmail,
+  readOneByUsername,
 };
 
 export default user;
