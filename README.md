@@ -1,3 +1,3 @@
-# Aurea-Lab
+# Curriculum
 
-Treinamento do https://curso.dev
+Gerador de currículo

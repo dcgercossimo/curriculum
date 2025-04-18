@@ -1,7 +1,7 @@
 {
-  "name": "aueralab",
+  "name": "curriculum",
   "version": "1.0.0",
-  "description": "Treinamento do https://curso.dev",
+  "description": "Gerador de curriculo",
   "main": "index.js",
   "scripts": {
     "dev": "trap \"services:stop\" INT TERM && npm run services:start && npm run migrations:up && next dev",
