@@ -1,7 +1,8 @@
 function Home() {
   return (
     <>
-      <h1>Rosângela meu amor!! Não sei o que seria da minha vida sem você! Quer casar comigo? Te amo!!!</h1>
+      <h1>Curriculum</h1>
+      <h2>Em construção</h2>
       <i>Daniel Gerçossimo</i>
     </>
   );
