@@ -15,6 +15,11 @@ exports.up = (pgm) => {
       notNull: true,
       unique: true,
     },
+    phone: {
+      type: 'varchar(20)',
+      notNull: true,
+      unique: true,
+    },
     password: {
       type: 'varchar(60)',
       notNull: true,

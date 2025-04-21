@@ -18,6 +18,7 @@ describe('GET /api/v1/users/[username]', () => {
         body: JSON.stringify({
           username: 'MesmoCase',
           email: 'mesmo.case@aurealab.com.br',
+          phone: '9999999999992',
           password: '123456',
         }),
       });
@@ -31,6 +32,7 @@ describe('GET /api/v1/users/[username]', () => {
         id: responseBody2.id,
         username: 'MesmoCase',
         email: 'mesmo.case@aurealab.com.br',
+        phone: '9999999999992',
         password: responseBody2.password,
         created_at: responseBody2.created_at,
         updated_at: responseBody2.updated_at,
@@ -50,6 +52,7 @@ describe('GET /api/v1/users/[username]', () => {
         body: JSON.stringify({
           username: 'CaseDiferente',
           email: 'case.diferente@aurealab.com.br',
+          phone: '9999999999999',
           password: '123456',
         }),
       });
@@ -63,6 +66,7 @@ describe('GET /api/v1/users/[username]', () => {
         id: responseBody2.id,
         username: 'CaseDiferente',
         email: 'case.diferente@aurealab.com.br',
+        phone: '9999999999999',
         password: responseBody2.password,
         created_at: responseBody2.created_at,
         updated_at: responseBody2.updated_at,
