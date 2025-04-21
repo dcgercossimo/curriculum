@@ -5,23 +5,24 @@ import password from './password.js';
 async function create(userInput) {
   await validateUniqueEmail(userInput.email);
   await validateUniqueUsername(userInput.username);
+  await validateUniquePhone(userInput.phone);
   await hashPasswordInObject(userInput);
 
   const newUser = await runInsertQuery(userInput);
   return newUser;
 
   async function runInsertQuery(userInput) {
-    const { username, email, password } = userInput;
+    const { username, email, phone, password } = userInput;
     const results = await database.query({
       text: `
         INSERT INTO
-          users (username, email, password)
+          users (username, email, phone, password)
         VALUES
-          ($1, LOWER($2), $3)
+          ($1, LOWER($2), $3, $4)
         RETURNING
           *
         ;`,
-      values: [username, email, password],
+      values: [username, email, phone, password],
     });
     return results.rows[0];
   }
@@ -41,25 +42,28 @@ async function readOneByUsername(username) {
 async function update(id, userInput) {
   await validateUniqueEmail(userInput.email);
   await validateUniqueUsername(userInput.username);
+  await validateUniquePhone(userInput.phone);
   await hashPasswordInObject(userInput);
 
   const newUser = await runUpdateQuery(id, userInput);
   return newUser;
 
   async function runUpdateQuery(id, userInput) {
-    const { email } = userInput;
+    const { email, phone } = userInput;
     const results = await database.query({
       text: `
         UPDATE
           users
         SET
-          email = LOWER($2)
+          email = LOWER($2),
+          phone = $3,
+          updated_at = current_timestamp
         WHERE
           id = $1
         RETURNING
           *
         ;`,
-      values: [id, email],
+      values: [id, email, phone],
     });
     return results.rows[0];
   }
@@ -85,6 +89,16 @@ async function validateUniqueUsername(username) {
   }
 }
 
+async function validateUniquePhone(phone) {
+  const user = await findOneByPhone(phone);
+  if (user) {
+    throw new ValidationError({
+      message: 'O celular informado já está em uso',
+      action: 'Utilize outro celular para realizar o cadastro',
+    });
+  }
+}
+
 async function hashPasswordInObject(userInput) {
   const hashedPassword = await password.hash(userInput.password);
   userInput.password = hashedPassword;
@@ -94,7 +108,7 @@ async function findOneByEmail(email) {
   const results = await database.query({
     text: `
       SELECT
-        id, username, email, password, created_at, updated_at
+        id, username, email, phone, password, created_at, updated_at
       FROM
         users
       WHERE
@@ -111,7 +125,7 @@ async function findOneByUsername(username) {
   const results = await database.query({
     text: `
       SELECT
-        id, username, email, password, created_at, updated_at
+        id, username, email, phone, password, created_at, updated_at
       FROM
         users
       WHERE
@@ -120,6 +134,23 @@ async function findOneByUsername(username) {
         1
       ;`,
     values: [username],
+  });
+  return results.rows[0];
+}
+
+async function findOneByPhone(phone) {
+  const results = await database.query({
+    text: `
+      SELECT
+        id, username, email, phone, password, created_at, updated_at
+      FROM
+        users
+      WHERE
+        phone = $1
+      LIMIT
+        1
+      ;`,
+    values: [phone],
   });
   return results.rows[0];
 }

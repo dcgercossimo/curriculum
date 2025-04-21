@@ -20,6 +20,7 @@ describe('POST /api/v1/users', () => {
         body: JSON.stringify({
           username: 'DanielGercossimo',
           email: 'dcgercossimo@aurealab.com.br',
+          phone: '9999999999999',
           password: '123456',
         }),
       });
@@ -30,6 +31,7 @@ describe('POST /api/v1/users', () => {
         id: responseBody.id,
         username: 'DanielGercossimo',
         email: 'dcgercossimo@aurealab.com.br',
+        phone: '9999999999999',
         password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
@@ -57,6 +59,7 @@ describe('POST /api/v1/users', () => {
         body: JSON.stringify({
           username: 'EmailDuplicado1',
           email: 'duplicado@aurealab.com.br',
+          phone: '9999999999998',
           password: '123456',
         }),
       });
@@ -70,6 +73,7 @@ describe('POST /api/v1/users', () => {
         body: JSON.stringify({
           username: 'EmailDuplicado2',
           email: 'Duplicado@aurealab.com.br',
+          phone: '9999999999997',
           password: '123456',
         }),
       });
@@ -93,6 +97,7 @@ describe('POST /api/v1/users', () => {
         body: JSON.stringify({
           username: 'UsernameDuplicado',
           email: 'username1@aurealab.com.br',
+          phone: '9999999999996',
           password: '123456',
         }),
       });
@@ -106,6 +111,7 @@ describe('POST /api/v1/users', () => {
         body: JSON.stringify({
           username: 'UserNameDuplicado',
           email: 'username2@aurealab.com.br',
+          phone: '9999999999995',
           password: '123456',
         }),
       });
@@ -116,6 +122,44 @@ describe('POST /api/v1/users', () => {
         name: 'ValidationError',
         message: 'O Username informado já está em uso',
         action: 'Utilize outro username para realizar o cadastro',
+        statusCode: 400,
+      });
+    }, 6000);
+
+    test('Duplicated phone,', async () => {
+      const response1 = await fetch('http://localhost:3000/api/v1/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: 'PhoneDuplicado1',
+          email: 'phone-duplicado1@aurealab.com.br',
+          phone: '9999999999994',
+          password: '123456',
+        }),
+      });
+      expect(response1.status).toBe(201);
+
+      const response2 = await fetch('http://localhost:3000/api/v1/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: 'PhoneDuplicado2',
+          email: 'phone-duplicado2@aurealab.com.br',
+          phone: '9999999999994',
+          password: '123456',
+        }),
+      });
+      expect(response2.status).toBe(400);
+
+      const response2Body = await response2.json();
+      expect(response2Body).toEqual({
+        name: 'ValidationError',
+        message: 'O celular informado já está em uso',
+        action: 'Utilize outro celular para realizar o cadastro',
         statusCode: 400,
       });
     }, 6000);
