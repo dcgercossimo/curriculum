@@ -17,7 +17,7 @@ async function putHandler(req, res) {
     return res.status(404).json({ message: 'Usuário não encontrado' });
   }
 
-  const updatedUser = await user.update(userFound.id, userInput);
+  const updatedUser = await user.update(userFound, userInput);
 
   return res.status(205).json(updatedUser);
 }

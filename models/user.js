@@ -39,14 +39,12 @@ async function readOneByUsername(username) {
   return userFound;
 }
 
-async function update(id, userInput) {
-  await validateUniqueEmail(userInput.email);
-  await validateUniqueUsername(userInput.username);
-  await validateUniquePhone(userInput.phone);
+async function update(existingUser, userInput) {
+  await mergeUserInputWithExistingUser(existingUser, userInput);
   await hashPasswordInObject(userInput);
 
-  const newUser = await runUpdateQuery(id, userInput);
-  return newUser;
+  const updatedUser = await runUpdateQuery(existingUser.id, userInput);
+  return updatedUser;
 
   async function runUpdateQuery(id, userInput) {
     const { email, phone } = userInput;
@@ -69,11 +67,25 @@ async function update(id, userInput) {
   }
 }
 
+async function mergeUserInputWithExistingUser(existingUser, userInput) {
+  if (!userInput.email) {
+    userInput.email = existingUser.email;
+  } else if (userInput.email !== existingUser.email) {
+    await validateUniqueEmail(userInput.email);
+  }
+
+  if (!userInput.phone) {
+    userInput.phone = existingUser.phone;
+  } else if (userInput.phone !== existingUser.phone) {
+    await validateUniquePhone(userInput.phone);
+  }
+}
+
 async function validateUniqueEmail(email) {
   const user = await findOneByEmail(email);
   if (user) {
     throw new ValidationError({
-      message: 'O e-mail informado já está em uso',
+      message: `O e-mail informado já está em uso`,
       action: 'Utilize outro e-mail para realizar o cadastro',
     });
   }
@@ -93,7 +105,7 @@ async function validateUniquePhone(phone) {
   const user = await findOneByPhone(phone);
   if (user) {
     throw new ValidationError({
-      message: 'O celular informado já está em uso',
+      message: `O celular informado já está em uso`,
       action: 'Utilize outro celular para realizar o cadastro',
     });
   }
