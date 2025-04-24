@@ -67,6 +67,33 @@ async function update(existingUser, userInput) {
   }
 }
 
+async function changePassword(existingUser, userInput) {
+  await validatePassword(userInput);
+  await hashPasswordInObject(userInput);
+
+  const updatedUser = await runChangePassword(existingUser.id, userInput);
+  return updatedUser;
+
+  async function runChangePassword(id, userInput) {
+    const { password } = userInput;
+    const results = await database.query({
+      text: `
+        UPDATE
+          users
+        SET
+          password = $2,
+          updated_at = current_timestamp
+        WHERE
+          id = $1
+        RETURNING
+          *
+        ;`,
+      values: [id, password],
+    });
+    return results.rows[0];
+  }
+}
+
 async function mergeUserInputWithExistingUser(existingUser, userInput) {
   if (!userInput.email) {
     userInput.email = existingUser.email;
@@ -107,6 +134,21 @@ async function validateUniquePhone(phone) {
     throw new ValidationError({
       message: `O celular informado já está em uso`,
       action: 'Utilize outro celular para realizar o cadastro',
+    });
+  }
+}
+
+async function validatePassword(userInput) {
+  if (!userInput.password) {
+    throw new ValidationError({
+      message: 'Senha não informada',
+      action: 'Informe uma senha para realizar a alteração',
+    });
+  }
+  if (userInput.password.length < 6) {
+    throw new ValidationError({
+      message: 'Senha muito curta',
+      action: 'A senha deve ter no mínimo 6 caracteres',
     });
   }
 }
@@ -171,6 +213,7 @@ const user = {
   create,
   readOneByUsername,
   update,
+  changePassword,
 };
 
 export default user;
