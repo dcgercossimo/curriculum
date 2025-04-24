@@ -12,7 +12,7 @@ function getNumberOfRounds() {
 }
 
 function getPepper() {
-  return process.env.PEPPER || 'pimentinha';
+  return process.env.PEPPER || '5@l0MaO';
 }
 
 async function compare(providedPassword, storePassword) {
