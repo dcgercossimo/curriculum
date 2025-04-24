@@ -1,3 +1,4 @@
+import password from 'models/password';
 import orchestrator from 'tests/orchestrator.js';
 import { version as uuidVersion } from 'uuid';
 
@@ -139,6 +140,40 @@ describe('PUT /api/v1/users/[username]/edit', () => {
       expect(uuidVersion(responseBody3.id)).toBe(4);
       expect(Date.parse(responseBody3.created_at)).not.toBeNaN();
       expect(Date.parse(responseBody3.updated_at)).not.toBeNaN();
+    }, 6000);
+
+    test('Change password', async () => {
+      const response1 = await fetch('http://localhost:3000/api/v1/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: 'AlterarSenha',
+          email: 'altera.senha@aurealab.com.br',
+          phone: '9999999999986',
+          password: '123456',
+        }),
+      });
+      expect(response1.status).toBe(201);
+      const responseBody1 = await response1.json();
+
+      const response2 = await fetch('http://localhost:3000/api/v1/users/AlterarSenha/changepassword', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          password: '1234567',
+        }),
+      });
+      expect(response2.status).toBe(205);
+
+      const response3 = await fetch('http://localhost:3000/api/v1/users/AlterarSenha');
+      expect(response3.status).toBe(200);
+      const responseBody3 = await response3.json();
+      expect(responseBody3.password).not.toEqual(responseBody1.password);
+      expect(await password.compare('1234567', responseBody3.password)).toBe(true);
     }, 6000);
   });
 });
